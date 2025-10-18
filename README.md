@@ -17,11 +17,11 @@ ________________________________________
 3. Tech Stack
 Frontend
 •	Next.js 15 (App Router): Used for building an interactive and responsive frontend interface.
-•	Tailwind CSS: For creating clean, modern, and mobile-friendly UI designs.
+•	Tailwind CSS , Shadcn UI , react spring , gsap , react-motion ,React Bits , Framer Motion , react charts library, : For creating clean, modern, and mobile-friendly UI designs.
 Backend
 •	Django REST Framework (DRF): Handles data logic, APIs, and backend processing.
 Database
-•	PostgreSQL: Stores user data, skills, messages, and payment records in a structured format.
+•	MongoDb: Stores user data, skills, messages, and payment records in a structured format.
 Authentication
 •	JWT (JSON Web Tokens): Used for secure login and registration through Django’s SimpleJWT or dj-rest-auth.
 Payment Integration
