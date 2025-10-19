@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from skillswap.settings_env import (
+    get_secret_key,
+    get_debug,
+    get_mongodb_uri,
+    get_jwt_secret,
+    get_stripe_secret_key,
+    get_stripe_publishable_key
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-98d96qhrx*nd+mb$4n#a)^w(=_z0atq2(qcm3-2oic3$z7^3@=')
+SECRET_KEY = get_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = get_debug()
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -45,6 +48,7 @@ INSTALLED_APPS = [
     
     # Third party apps
     'rest_framework',
+    'rest_framework.authtoken',  # Required for dj-rest-auth
     'rest_framework_simplejwt',
     'corsheaders',
     'channels',
@@ -88,13 +92,14 @@ WSGI_APPLICATION = 'skillswap.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Dual Database Approach:
+# - SQLite for Django's built-in apps (admin, auth, sessions) - minimal overhead
+# - PyMongo via api/db.py for application data (users, skills, matches, messages)
+
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'skillswap',
-        'CLIENT': {
-            'host': os.getenv('MONGODB_URI', 'mongodb://localhost:27017/skillswap'),
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -165,7 +170,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': os.getenv('JWT_SECRET', SECRET_KEY),
+    'SIGNING_KEY': get_jwt_secret(),
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
@@ -196,5 +201,5 @@ CORS_ALLOW_CREDENTIALS = True
 ASGI_APPLICATION = 'skillswap.asgi.application'
 
 # Stripe Configuration
-STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
-STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_SECRET_KEY = get_stripe_secret_key()
+STRIPE_PUBLISHABLE_KEY = get_stripe_publishable_key()

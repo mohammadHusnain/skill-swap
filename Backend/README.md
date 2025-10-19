@@ -5,11 +5,13 @@ A Django REST Framework backend for the SkillSwap skill exchange platform.
 ## Features
 
 - Django REST Framework for API endpoints
-- MongoDB integration using djongo
+- MongoDB integration using djongo with dedicated client layer
 - JWT authentication with SimpleJWT
 - Django Channels for WebSocket support (ready for messaging)
 - CORS configuration for frontend integration
 - Stripe integration for payments (test mode)
+- Centralized environment configuration with validation
+- Hugging Face API integration for ML models
 
 ## Local Setup
 
@@ -43,7 +45,7 @@ A Django REST Framework backend for the SkillSwap skill exchange platform.
    ```bash
    cp env.example .env
    ```
-   Edit `.env` file with your configuration values.
+   Edit `.env` file with your configuration values. **All environment variables are validated at startup** - missing required variables will cause the application to fail with descriptive error messages.
 
 5. **Setup MongoDB:**
    - Install MongoDB locally or use MongoDB Compass
@@ -75,12 +77,38 @@ To connect MongoDB Compass to your local database:
 - Admin: `http://localhost:8000/admin/`
 - API Root: `http://localhost:8000/api/`
 
+## Environment Variables
+
+The application validates all required environment variables at startup:
+
+### Required Variables
+- `SECRET_KEY` - Django secret key
+- `MONGODB_URI` - MongoDB connection string
+- `JWT_SECRET` - JWT signing secret
+- `STRIPE_SECRET_KEY` - Stripe secret key (test mode)
+- `STRIPE_PUBLISHABLE_KEY` - Stripe publishable key (test mode)
+- `HF_TOKEN` - Hugging Face API token for ML model integration
+
+### Optional Variables
+- `DEBUG` - Debug mode (defaults to False)
+
+## MongoDB Client Layer
+
+The application includes a dedicated MongoDB client layer (`api/db.py`) with helper functions:
+- `get_database()` - Get database instance
+- `get_collection(name)` - Get collection by name
+- `health_check()` - Test MongoDB connection
+- `close_connection()` - Gracefully close connection
+
 ## Project Structure
 
 ```
 Backend/
 ├── skillswap/          # Django project settings
+│   ├── settings.py     # Main Django settings
+│   └── settings_env.py # Centralized environment config
 ├── api/                # Main API application
+│   └── db.py          # MongoDB client layer
 ├── manage.py           # Django management script
 ├── requirements.txt    # Python dependencies
 ├── env.example         # Environment variables template
